@@ -1,9 +1,31 @@
-import { View, Text, Button, Image } from "react-native";
+import { View, Text, Button, Image, Modal } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { mainStyle } from "./styles/mainStyle";
 import Header from "./components/Header";
+import NoteInput from "./components/notes/NoteInput";
+import { useState } from "react";
+import AllNotes from "./components/notes/AllNotes";
+
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
+  const [showGoalInput, setShowGoalInput] = useState(false);
+  const [notes, setNotes] = useState([]);
+
+  const saveNote = (newNote) => {
+    const newNoteObject = {
+      text: newNote,
+      id: uuidv4(),
+    };
+    setNotes([...notes, newNoteObject]);
+    setShowGoalInput(false);
+  };
+
+  const handleNoteDelete = (id) => {
+    setNotes((notes) => notes.filter((note) => note.id !== id));
+  };
+
   return (
     <View style={mainStyle.appContainer}>
       <StatusBar style="auto" />
@@ -18,16 +40,37 @@ const App = () => {
             <Header title="Keep-Note" align="center" />
           </View>
 
-          <View style={mainStyle.pt12}>
-            <Text style={{ fontSize: 20, textAlign: "center" }}>
-              Why don't you add some notes ?
-            </Text>
-          </View>
+          {notes.length < 1 ? (
+            <View style={mainStyle.pt12}>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>
+                Why don't you add some notes ?
+              </Text>
+            </View>
+          ) : (
+            ""
+          )}
+
+          <Modal
+            visible={showGoalInput}
+            onRequestClose={() => setShowGoalInput(false)}
+            animationType="slide"
+          >
+            <NoteInput
+              hideModal={() => setShowGoalInput(false)}
+              handleNewNote={(newNote) => saveNote(newNote)}
+            />
+          </Modal>
+
+          <AllNotes notes={notes} deleteNote={(id) => handleNoteDelete(id)} />
         </View>
       </View>
 
       <View style={{ paddingTop: 16 }}>
-        <Button title="Add Note" color="steelblue" onPress={() => {}} />
+        <Button
+          title="Add Note"
+          color="steelblue"
+          onPress={() => setShowGoalInput(true)}
+        />
       </View>
     </View>
   );
