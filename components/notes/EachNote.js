@@ -1,9 +1,9 @@
 import { View, Text, Pressable, Alert } from "react-native";
 import { mainStyle } from "../../styles/mainStyle";
 
-const EachNote = ({ note, deleteNote }) => {
+const EachNote = ({ note, deleteNote, edit }) => {
   const handleEachNote = (id) => {
-    Alert.alert("What you want to do?", "Edit or Delete?", [
+    Alert.alert("What you want to do?", "", [
       {
         text: "Cancel",
         onPress: () => {},
@@ -11,7 +11,7 @@ const EachNote = ({ note, deleteNote }) => {
       },
       {
         text: "Edit",
-        onPress: () => console.log("edit"),
+        onPress: () => edit(id),
       },
       {
         text: "Delete",

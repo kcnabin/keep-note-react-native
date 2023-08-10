@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TextInput, Button, Image } from "react-native";
 import { mainStyle } from "../../styles/mainStyle";
 import Header from "../Header";
 
-const NoteInput = ({ hideModal, handleNewNote }) => {
+const NoteInput = ({
+  hideModal,
+  handleNewNote,
+  editNote,
+  noteToEdit,
+  updateNote,
+}) => {
   const [newNote, setNewNote] = useState("");
+
+  useEffect(() => {
+    if (noteToEdit) {
+      setNewNote(noteToEdit.text);
+    }
+  }, [noteToEdit]);
 
   return (
     <View
@@ -21,7 +33,7 @@ const NoteInput = ({ hideModal, handleNewNote }) => {
               source={require("../../assets/note-icon.png")}
               style={{ width: 30, height: 30, marginEnd: 8 }}
             />
-            <Header title="Add Task" />
+            <Header title={editNote ? "Update Note" : "Add Task"} />
           </View>
         </View>
 
@@ -36,11 +48,16 @@ const NoteInput = ({ hideModal, handleNewNote }) => {
           <View style={mainStyle.flexCenter}>
             <View style={{ marginEnd: 24 }}>
               <Button
-                title="Save"
+                title={editNote ? "Update" : "Save"}
                 onPress={() => {
-                  handleNewNote(newNote);
+                  if (editNote) {
+                    updateNote({ ...noteToEdit, text: newNote });
+                  } else {
+                    handleNewNote(newNote);
+                  }
                   setNewNote("");
                 }}
+                disabled={!newNote}
               />
             </View>
             <Button title="Cancel" onPress={hideModal} color="tomato" />

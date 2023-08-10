@@ -12,8 +12,19 @@ import { v4 as uuidv4 } from "uuid";
 const App = () => {
   const [showGoalInput, setShowGoalInput] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [editNote, setEditNote] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState(null);
+
+  const resetStates = () => {
+    setShowGoalInput(false);
+    setNoteToEdit(null);
+    setEditNote(false);
+  };
 
   const saveNote = (newNote) => {
+    if (!newNote) {
+      return;
+    }
     const newNoteObject = {
       text: newNote,
       id: uuidv4(),
@@ -24,6 +35,19 @@ const App = () => {
 
   const handleNoteDelete = (id) => {
     setNotes((notes) => notes.filter((note) => note.id !== id));
+  };
+
+  const handleEdit = (id) => {
+    setEditNote(true);
+    setShowGoalInput(true);
+    setNoteToEdit(notes.filter((note) => note.id === id)[0]);
+  };
+
+  const handleNoteUpdate = (updatedNote) => {
+    setNotes((notes) =>
+      notes.map((note) => (note.id !== updatedNote.id ? note : updatedNote))
+    );
+    resetStates();
   };
 
   return (
@@ -56,12 +80,21 @@ const App = () => {
             animationType="slide"
           >
             <NoteInput
-              hideModal={() => setShowGoalInput(false)}
+              hideModal={() => resetStates()}
               handleNewNote={(newNote) => saveNote(newNote)}
+              editNote={editNote}
+              noteToEdit={noteToEdit}
+              updateNote={(updatedNote) => {
+                handleNoteUpdate(updatedNote);
+              }}
             />
           </Modal>
 
-          <AllNotes notes={notes} deleteNote={(id) => handleNoteDelete(id)} />
+          <AllNotes
+            notes={notes}
+            deleteNote={(id) => handleNoteDelete(id)}
+            edit={(id) => handleEdit(id)}
+          />
         </View>
       </View>
 
